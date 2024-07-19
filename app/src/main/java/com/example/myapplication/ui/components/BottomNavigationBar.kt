@@ -23,13 +23,12 @@ fun BottomNavigationBar(navController: NavController, currentRoute: String?, onS
         containerColor = Color.White
     ) {
         val navigationItems = listOf(
-            NavigationItem("home", "Kiosk", R.drawable.home_icon_unselected, R.drawable.home_icon_selected),
-            NavigationItem("scan", "Scan", R.drawable.scan_icon_unselected, R.drawable.scan_icon_selected),
-            NavigationItem("return", "Return", R.drawable.return_icon_unselected, R.drawable.return_icon_selected),
-            NavigationItem("account", "Account", R.drawable.account_icon_unselected, R.drawable.account_icon_selected)
+            NavigationItem("home", "", R.drawable.home_icon_unselected, R.drawable.home_icon_selected),
+            NavigationItem("scan", "", R.drawable.scan_icon_unselected, R.drawable.scan_icon_selected),
+            NavigationItem("return", "", R.drawable.return_icon_unselected, R.drawable.return_icon_selected),
+            NavigationItem("account", "", R.drawable.account_icon_unselected, R.drawable.account_icon_selected)
         )
 
-        Log.d("REzero", "Current route: $currentRoute")
 
         navigationItems.forEach { item ->
             NavigationBarItem(
