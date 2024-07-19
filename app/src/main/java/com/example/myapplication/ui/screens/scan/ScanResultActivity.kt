@@ -1,168 +1,188 @@
 package com.example.myapplication.ui.screens.scan
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.myapplication.R
+import coil.compose.AsyncImage
+import com.example.myapplication.ui.data.model.Product
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.ui.theme.Typography
+import com.example.myapplication.ui.viewmodel.ScanResultViewModel
+import com.example.myapplication.ui.viewmodel.ScanResultViewModelFactory
 
 class ScanResultActivity : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val viewModel: ScanResultViewModel by viewModels { ScanResultViewModelFactory() }
 
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                ScanResultPage(onNavigateUp = { finish() })
+                ScanResultPage(onNavigateUp = { finish() }, viewModel)
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun ScanResultPage(onNavigateUp: () -> Unit) {
-        val scrollState = rememberScrollState()
+    fun ScanResultPage(onNavigateUp: () -> Unit, viewModel: ScanResultViewModel) {
+        val isLoading by viewModel.isLoading.collectAsState()
+        val error by viewModel.error.collectAsState()
+        val product by viewModel.product.collectAsState()
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .verticalScroll(scrollState)
-        ) {
-            // Top App Bar
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+        LaunchedEffect(Unit) {
+            viewModel.loadProduct(2)
+        }
+        Scaffold(
+            containerColor = Color.White,
+            topBar = {
+                TopAppBar(
+                    title = { },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateUp) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
-            )
-
-            // Product Image
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Almond Butter",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp),
-                contentScale = ContentScale.Crop
-            )
-
-            // Product Details
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp)
-            ) {
-                Text(
-                    text = "Almond butter",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
                 )
+            }
+        ) { paddingValues ->
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 
-                Spacer(modifier = Modifier.height(8.dp))
+                } else if (product != null) {
+                    ProductDetails(product!!)
+                } else if (error != null) {
+                    Text(
+                        text = error ?: "Unknown error",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
+    }
 
-                Text(
-                    text = "$8.99",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color.Gray
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Description",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Barney Butter is made in a peanut-free facility! Our dedicated facility guarantees that Barney Butter is truly free of peanuts and contaminants. Perfect for peanut free environments like schools and airplanes!",
-                    style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = 24.sp
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Nutritional facts",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Serving Size: 2 Tbsp (32g)",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = "Calories 190, Total Fat 16g (25% DV), Saturated Fat 1g (5% DV), Trans Fat 0g, Cholesterol 0mg (0% DV),",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "Dietary Fiber 4g (16% DV), Total Sugars 1g",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = "Protein 7g, Vitamin D 0mcg (0% DV), Calcium 80mg (8% DV), Iron 1mg (6% DV), Potassium 240mg (7% DV)",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+    @RequiresApi(Build.VERSION_CODES.Q)
+    @Composable
+    fun ProductDetails(product: Product) {
+        LazyColumn {
+            item {
+                AsyncImage(
+                    model = product.image,
+                    contentDescription = product.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    contentScale = ContentScale.Crop
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = { /* Add to cart logic */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text("Add to cart")
+            item {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = product.name,
+                        style = Typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "$${product.price}",
+                        style = Typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(32.dp))
+
+            item {
+                CollapsibleSection("Source Of Manufacture", product.source_of_manufacture ?: "")
+            }
+
+            item {
+                CollapsibleSection("Materials", product.materials_ko ?: "")
+            }
+
+            item {
+                val nutrientDetails = product.nutrients_ko.detail.map { (key, value) ->
+                    "$key: ${value.amount} (${value.percent})"
+                }.joinToString("\n")
+                CollapsibleSection("Nutrients", nutrientDetails)
+            }
+
+            item {
+                CollapsibleSection("Allergens", product.allergens.joinToString(", "))
+            }
         }
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.Q)
+    @Composable
+    fun CollapsibleSection(title: String, content: String) {
+        var expanded by remember { mutableStateOf(false) }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            onClick = { expanded = !expanded },
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White // 배경색을 흰색으로 설정
+            ),
+            border = BorderStroke(1.dp, Color.LightGray), // 테두리 추가
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 0.dp // 그림자 제거
+            )
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = title,
+                        style = Typography.bodyLarge,
+                    )
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = if (expanded) "Collapse" else "Expand"
+                    )
+                }
+                AnimatedVisibility(visible = expanded) {
+                    Text(
+                        text = content,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
+        }
+    }
 }
