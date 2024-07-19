@@ -12,8 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDsUlQGxl60rNAoP0gnmsxZSQmde2zf05c"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.screens.main.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MyApplication">
@@ -23,6 +27,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.screens.scan.ScanResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.screens.scan.AllergyWarningActivity"
+            android:exported="false" />
+        <activity android:name=".ui.screens.home.AllergiesSelectionActivity"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
