@@ -54,29 +54,19 @@ fun ScanPage() {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        Button(onClick = {
-            val intent = Intent(context, AllergyWarningActivity::class.java)
-            context.startActivity(intent)
-//            scanner.startScan()
-//                .addOnSuccessListener { barcode ->
-//
-//                }
-//                .addOnCanceledListener {
-//                    scanResult = "Scan cancelled"
-//                    Log.d("REZero", "취소")
-//                }
-//                .addOnFailureListener { e ->
-//                    scanResult = "Scan failed: ${e.message}"
-//                    Log.d("REZero", "실패 $e")
-//                }
-        }) {
-            Text("Start Scan")
-        }
+            scanner.startScan()
+                .addOnSuccessListener { barcode ->
+                    val intent = Intent(context, ScanResultActivity::class.java)
+                    context.startActivity(intent)
+                }
+                .addOnCanceledListener {
+                    scanResult = "Scan cancelled"
+                    Log.d("REZero", "취소")
+                }
+                .addOnFailureListener { e ->
+                    scanResult = "Scan failed: ${e.message}"
+                    Log.d("REZero", "실패 $e")
+                }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        scanResult?.let {
-            Text(it)
-        }
     }
 }
