@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,6 +76,20 @@ dependencies {
     implementation(kotlin("script-runtime"))
     implementation (libs.play.services.code.scanner)
     implementation (libs.maps.compose)
+
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.logging.interceptor)
+    implementation (libs.androidx.lifecycle.viewmodel.compose)
+    implementation (libs.androidx.lifecycle.runtime.ktx.v240)
+
+    implementation (libs.androidx.activity.ktx)
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation (libs.coil.compose)
+
+    implementation (libs.ui)
+    implementation (libs.androidx.material)
+    implementation (libs.ui.tooling)
 
 }
 
