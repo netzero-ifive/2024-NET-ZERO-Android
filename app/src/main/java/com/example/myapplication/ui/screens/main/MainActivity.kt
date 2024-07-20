@@ -25,7 +25,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.components.BottomNavigationBar
 import com.example.myapplication.ui.components.CommonTopAppBar
-import com.example.myapplication.ui.screens.account.AccountPage
 import com.example.myapplication.ui.screens.home.HomePage
 import com.example.myapplication.ui.screens.scan.ScanPage
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -37,6 +36,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.ui.data.repository.DataRepository
+import com.example.myapplication.ui.screens.account.AllergiesSelectionScreen
 import com.example.myapplication.ui.viewmodel.MainViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -105,15 +105,17 @@ class MainActivity : ComponentActivity() {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
+        val context = LocalContext.current
+
         // Update selectedScreen based on the current route
         LaunchedEffect(currentRoute) {
             currentRoute?.let {
                 selectedScreen = when (it) {
-                    "home" -> "Kiosk"
-                    "scan" -> "Scan"
-                    "return" -> "BottleDrop"
-                    "account" -> "Account"
-                    else -> "Kiosk"
+                    "home" -> "앱"
+                    "scan" -> "스캔"
+                    "return" -> "매장 안내"
+                    "account" -> "개인정보"
+                    else -> "앱"
                 }
                 tapBarIcon = when(it){
                     "home" -> Icons.Default.Settings
@@ -140,7 +142,8 @@ class MainActivity : ComponentActivity() {
                 composable("scan") { ScanPage() }
                 composable("return") { BottleDropPage(viewModel)
                 }
-                composable("account") { AccountPage() }
+                composable("account") {
+                    AllergiesSelectionScreen(onNavigateUp = { }, context =context )}
             }
         }
     }
