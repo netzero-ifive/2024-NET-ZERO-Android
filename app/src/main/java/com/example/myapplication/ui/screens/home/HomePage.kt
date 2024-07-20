@@ -1,50 +1,30 @@
 package com.example.myapplication.ui.screens.home
 
-import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.R
-import com.example.myapplication.ui.components.CommonTopAppBar
-import com.example.myapplication.ui.data.model.Product
-import com.example.myapplication.ui.screens.scan.AllergyWarningActivity
 import com.example.myapplication.ui.theme.Typography
 import com.example.myapplication.ui.viewmodel.MainViewModel
-import kotlinx.coroutines.flow.StateFlow
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
@@ -53,9 +33,6 @@ fun HomePage(viewModel: MainViewModel) {
     val allergens by viewModel.allergens.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
-
-
-
 
     LaunchedEffect(Unit) {
         viewModel.loadAllergens()
@@ -66,76 +43,94 @@ fun HomePage(viewModel: MainViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Main content
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(16.dp)
-        ) {
-            // Image and text overlay
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(350.dp)
-                    .background(Color.White)
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
-                    contentDescription = "Barcode Scanner",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+        // Circular percentage indicator
+        CircularPercentageIndicator(percentage = 75f)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text("오늘의 탄소 중립 실천", modifier = Modifier.align(Alignment.CenterHorizontally))
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // List items
+        ListItem(
+            headlineContent = { Text("알러지", style = Typography.bodySmall) },
+            trailingContent = {
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = null
                 )
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Text(
-                        "Scan a barcode for allergy information",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = Color.White
-                    )
-                    Text(
-                        "We're committed to providing you with the most up-to-date product information.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
-                    )
+            },
+            colors = ListItemDefaults.colors(containerColor = Color.White),
+            modifier = Modifier
+                .clickable {
+                    // Handle click
                 }
-            }
+                .fillMaxWidth()
+        )
+        ListItem(
+            headlineContent = { Text("플라스틱 페트병", style = Typography.bodySmall) },
+            trailingContent = {
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = null
+                )
+            },
+            colors = ListItemDefaults.colors(containerColor = Color.White),
+            modifier = Modifier
+                .clickable {
+                    // Handle click
+                }
+                .fillMaxWidth()
+        )
+    }
+}
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // List items
-            ListItem(
-                headlineContent = { Text("Allergies", style = Typography.bodySmall) },
-                trailingContent = {
-                    Icon(
-                        Icons.Default.KeyboardArrowRight,
-                        contentDescription = null
-                    )
-                },
-                colors = ListItemDefaults.colors(containerColor = Color.White),
-                modifier = Modifier
-                    .clickable {
-                        val intent = Intent(context, AllergiesSelectionActivity::class.java)
-                        context.startActivity(intent)
-                    }
-                    .fillMaxWidth()
+@Composable
+fun CircularPercentageIndicator(
+    percentage: Float,
+    modifier: Modifier = Modifier,
+    color: Color = Color(0xFF59F28C),
+    strokeWidth: Float = 30f // 두께를 30f로 설정
+) {
+    val sweepAngle = 360 * percentage / 100
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(200.dp) // 크기를 200dp로 조정
+            .padding(16.dp)
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            // 바깥 회색 원 그리기
+            drawCircle(
+                color = Color.LightGray,
+                radius = size.minDimension / 2,
+                style = Stroke(width = strokeWidth)
             )
-            ListItem(
-                headlineContent = { Text("Plastic Bottles", style = Typography.bodySmall) },
-                trailingContent = {
-                    Icon(
-                        Icons.Default.KeyboardArrowRight,
-                        contentDescription = null
-                    )
-                },
-                colors = ListItemDefaults.colors(containerColor = Color.White),
+            // 퍼센트에 해당하는 부분 그리기
+            drawArc(
+                color = color,
+                startAngle = -90f,
+                sweepAngle = sweepAngle,
+                useCenter = false,
+                topLeft = Offset(
+                    (size.width - size.minDimension) / 2,
+                    (size.height - size.minDimension) / 2
+                ),
+                size = Size(size.minDimension, size.minDimension),
+                style = Stroke(width = strokeWidth)
             )
         }
+        Text(
+            text = "${percentage.toInt()}%",
+            style = MaterialTheme.typography.bodyLarge,
+            color = color
+        )
     }
+
+
 }
